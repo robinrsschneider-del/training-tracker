@@ -4,6 +4,7 @@ name: Deploy to GitHub Pages
   push:
     branches:
       - main
+      - develop
 
 permissions:
   contents: read
@@ -34,14 +35,25 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Prepare INT path
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          mkdir -p site/int
+          cp -r dist/* site/int/
+
+      - name: Prepare PROD path
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p site
+          cp -r dist/* site/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./site
 
   deploy:
     needs: build
-
     runs-on: ubuntu-latest
 
     environment:
