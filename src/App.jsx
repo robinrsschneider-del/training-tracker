@@ -659,6 +659,19 @@ function Stats() {
 function Settings({ workouts, setWorkouts }) {
   const [editingKey, setEditingKey] = useState(null);
 
+  function reloadDefaultWorkouts() {
+    const confirmed = window.confirm(
+      "Standard-Workouts neu laden?\n\nEigene Änderungen an Workout-Vorlagen gehen verloren.\nGespeicherte Trainings bleiben erhalten."
+    );
+
+    if (!confirmed) return;
+
+    localStorage.removeItem("workouts");
+    setWorkouts(defaultWorkouts);
+
+    alert("Standard-Workouts wurden neu geladen.");
+  }
+
   function createWorkout() {
     const key = `custom-${Date.now()}`;
     setWorkouts({
@@ -733,25 +746,41 @@ function Settings({ workouts, setWorkouts }) {
   />
 </div>
 
-      {!workout && (
-        <>
-          <div className="card">
-            <p className="muted">Workouts verwalten</p>
-            <button className="primaryButton" onClick={createWorkout}>
-              Neues Workout hinzufügen
-            </button>
-          </div>
+<div className="card">
+  <p className="muted">Workouts</p>
 
-          <div className="workoutList">
-            {Object.entries(workouts).map(([key, item]) => (
-              <button key={key} onClick={() => setEditingKey(key)}>
-                <strong>{item.title}</strong>
-                <span>Bearbeiten</span>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+  <button
+    className="primaryButton"
+    onClick={reloadDefaultWorkouts}
+  >
+    🔄 Standard-Workouts neu laden
+  </button>
+
+  <p className="muted">
+    Lädt die Workouts aus dem Code neu.
+    Gespeicherte Trainings bleiben erhalten.
+  </p>
+</div>
+
+{!workout && (
+  <>
+    <div className="card">
+      <p className="muted">Workouts verwalten</p>
+      <button className="primaryButton" onClick={createWorkout}>
+        Neues Workout hinzufügen
+      </button>
+    </div>
+
+    <div className="workoutList">
+      {Object.entries(workouts).map(([key, item]) => (
+        <button key={key} onClick={() => setEditingKey(key)}>
+          <strong>{item.title}</strong>
+          <span>Bearbeiten</span>
+        </button>
+      ))}
+    </div>
+  </>
+)}
 
       {workout && (
         <WorkoutEditor
